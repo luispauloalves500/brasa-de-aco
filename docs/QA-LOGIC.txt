@@ -1,0 +1,44 @@
+
+> brasa-de-aco@0.1.0 test
+> node --test tests/*.test.mjs
+
+{"route":"A","seconds":238,"deaths":9,"continues":1,"rescues":7,"score":74315}
+{"route":"B","seconds":415,"deaths":24,"continues":4,"rescues":6,"score":69480}
+✔ campanha simulada da praia aos resultados pela rota A (445.629433ms)
+✔ campanha simulada da praia aos resultados pela rota B (342.091348ms)
+✔ RNG reproduzível e intervalo correto (1.537458ms)
+✔ swept colisão detecta projétil através de objeto fino (0.196359ms)
+✔ estado inicial, fallback infinito e três dificuldades (2.206844ms)
+✔ deslocamento independe de 30/60/120 renderizações (4.152757ms)
+✔ salto variável e aterrissagem (1.698675ms)
+✔ jump buffer registra e coyote time permite borda (0.393508ms)
+✔ armas consomem munição e fallback é automático (0.698028ms)
+✔ cadência usa relógio de simulação (5.481207ms)
+✔ mira alta e diagonal normalizadas (0.337247ms)
+✔ granadas limitadas, arco e explosão (1.224939ms)
+✔ melee contextual, escudo e explosivo (0.313022ms)
+✔ dois slots e reabastecimento respeitam capacidade (0.687316ms)
+✔ ambas as rotas alteram geometria e encontros, sem duplicar primeiro setor (0.586746ms)
+✔ resgates e segredos não duplicam pontuação (0.226143ms)
+✔ morte restaura checkpoint sem duplicar recompensas (0.602854ms)
+✔ continue restaura reservas e preserva rota (0.334159ms)
+✔ escudo protege exatamente um impacto (0.124972ms)
+✔ veículo entra/sai e destruição permite ejeção segura (0.80223ms)
+✔ Bento recebe 10% menos dano no veículo (0.218821ms)
+✔ IA tem estado enter e telegráfico antes de atacar (0.232252ms)
+✔ minichefe derrotado libera progressão e recompensa (0.206388ms)
+✔ chefe intro invulnerável, fases e remoção de ameaças (0.388743ms)
+✔ chefe cria os três padrões com aviso (0.859287ms)
+✔ pausa congela simulação e contador (0.296662ms)
+✔ save serializa, valida checksum e rejeita corrupção (1.336437ms)
+✔ localização tem chaves PT/EN equivalentes (0.123642ms)
+✔ catálogo da fase referencia somente inimigos conhecidos (0.118228ms)
+✔ projéteis e partículas lógicas têm limite de vida (0.299091ms)
+ℹ tests 30
+ℹ suites 0
+ℹ pass 30
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 885.988871

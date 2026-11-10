@@ -1,0 +1,15 @@
+name: Static game checks
+on: [push, pull_request]
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm test
+      - name: Validate modules
+        run: for f in src/*.js; do node --check "$f"; done
+      - name: Validate static entry points
+        run: test -s index.html && test -s style.css && test -s docs/GDD.md && test -f .nojekyll
