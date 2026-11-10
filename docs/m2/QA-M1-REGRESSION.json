@@ -1,0 +1,107 @@
+[
+  {
+    "ok": true,
+    "scene": "menu",
+    "checks": [
+      "boot/menu",
+      "new/setup/briefing/play",
+      "pause/overlay/return",
+      "route/checkpoint",
+      "PT/EN",
+      "no runtime/resource errors"
+    ],
+    "errors": [],
+    "x": 55,
+    "time": 0,
+    "metrics": {
+      "frames": 2,
+      "meanMS": 6.749999997019771,
+      "p99": 16.702000000000012
+    }
+  },
+  {
+    "ok": true,
+    "scene": "mangrove",
+    "checks": [
+      "boot/menu",
+      "new/setup/briefing/play",
+      "pause/overlay/return",
+      "route/checkpoint",
+      "PT/EN",
+      "simulation reached mangrove",
+      "no runtime/resource errors"
+    ],
+    "errors": [],
+    "x": 700.5555555555572,
+    "time": 5.899999999999984,
+    "metrics": {
+      "frames": 2,
+      "meanMS": 19.499999998509885,
+      "p99": 38.89799999701977
+    }
+  },
+  {
+    "ok": true,
+    "scene": "channels",
+    "checks": [
+      "boot/menu",
+      "new/setup/briefing/play",
+      "pause/overlay/return",
+      "route/checkpoint",
+      "PT/EN",
+      "simulation reached channels",
+      "no runtime/resource errors"
+    ],
+    "errors": [],
+    "x": 1360.55555555555,
+    "time": 11.90000000000017,
+    "metrics": {
+      "frames": 2,
+      "meanMS": 17.50000000298023,
+      "p99": 18.298000005960468
+    }
+  },
+  {
+    "ok": true,
+    "scene": "boss",
+    "checks": [
+      "boot/menu",
+      "new/setup/briefing/play",
+      "pause/overlay/return",
+      "route/checkpoint",
+      "PT/EN",
+      "simulation reached boss",
+      "no runtime/resource errors"
+    ],
+    "errors": [],
+    "x": 3959.6666666667807,
+    "time": 59.83333333333122,
+    "metrics": {
+      "frames": 2,
+      "meanMS": 8.74999999701977,
+      "p99": 16.63600000000001
+    }
+  },
+  {
+    "ok": true,
+    "scene": "finish",
+    "checks": [
+      "boot/menu",
+      "new/setup/briefing/play",
+      "pause/overlay/return",
+      "route/checkpoint",
+      "PT/EN",
+      "boss/results/ending/credits",
+      "simulation reached finish",
+      "no runtime/resource errors"
+    ],
+    "errors": [],
+    "x": 3976.3333333334485,
+    "time": 89.58333333332953,
+    "metrics": {
+      "frames": 2,
+      "meanMS": 16.900000001490113,
+      "p99": 17.696000002980227
+    }
+  }
+]

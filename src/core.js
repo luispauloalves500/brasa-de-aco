@@ -30,7 +30,7 @@ export function level(route=null){
 export class Game{
  constructor(options={},emit=()=>{}){this.options=options;this.emit=emit;this.rng=new RNG(1987);this.reset('lia','veteran')}
  reset(character='lia',difficulty='veteran'){
-  this.character=character;this.difficulty=difficulty;this.diff=DIFFICULTIES[difficulty]||DIFFICULTIES.veteran;this.route=null;this.time=0;this.tick=0;this.camera=0;this.score=0;this.combo=0;this.comboTime=0;this.deaths=0;this.continues=0;this.rescued=[];this.found=[];this.scored=[];this.flags={};this.done=false;this.gameover=false;this.lastCheckpoint=0;this.state='play';
+  this.character=character;this.difficulty=difficulty;this.diff=DIFFICULTIES[difficulty]||DIFFICULTIES.veteran;this.route=null;this.time=0;this.tick=0;this.camera=0;this.score=0;this.combo=0;this.comboTime=0;this.deaths=0;this.continues=0;this.rescued=[];this.found=[];this.scored=[];this.flags={};this.done=false;this.gameover=false;this.winTimer=0;this.lastCheckpoint=0;this.state='play';
   Object.assign(this,level());this.player={x:55,y:FLOOR-34,w:18,h:34,vx:0,vy:0,face:1,ground:true,crouch:false,coyote:.09,buffer:0,shoot:0,grenade:0,switch:0,melee:0,inv:1.8,dead:0,lives:this.diff.lives,shield:this.options.shield?1:0,slots:[],slot:-1,grenades:5,dodge:0,dodgeCD:0,vehicle:false,anim:0,aimX:1,aimY:0};
   this.bullets=[];this.grenades=[];this.effects=[];this.hazards=[];this.boss=null;this.mini={x:2510,y:164,w:76,h:46,hp:1200,max:1200,active:false,dead:false,timer:2,warning:0,phase:0,flash:0};this.vehicle={x:2710,y:180,w:56,h:30,hp:300,max:300,active:false,critical:0,dead:false};
   this.snapshot=this.capture();this.emit('radio','radio1');
@@ -89,7 +89,7 @@ export class Game{
   if(this.boss?.active){const panel=this.crates.find(c=>c.id==='boss-panel'&&c.hp>0&&Math.abs(c.x-p.x)<35);if(panel){panel.hp=0;this.boss.timer=3;this.boss.warning=0;this.event('notice','core');}}
  }
  enemyShot(e,spread=1){const p=this.player;const dx=p.x+9-(e.x+e.w/2),dy=p.y+18-(e.y+10);const angle=Math.atan2(dy,dx);for(let i=0;i<spread;i++){const a=angle+(i-(spread-1)/2)*.17;this.bullets.push({x:e.x+e.w/2,y:e.y+10,vx:Math.cos(a)*105*this.diff.bullet,vy:Math.sin(a)*105*this.diff.bullet,life:4,damage:1,hostile:true,size:3,color:'#ff6651'});}this.event('sound','enemy');}
- updateEnemies(dt){const p=this.player;for(const e of this.enemies){if(e.hp<=0)continue;e.flash=Math.max(0,e.flash-dt);if(Math.abs(e.x-p.x)>310)continue;
+ updateEnemies(dt){const p=this.player;for(const e of this.enemies){if(e.hp<=0)continue;e.flash=Math.max(0,e.flash-dt);if(Math.abs(e.x-p.x)>310||e.x+e.w<this.camera||e.x>this.camera+426)continue;
    if(e.state==='sleep'){e.state='enter';e.timer=.8;e.spawned=true;}
    e.timer-=dt;e.facing=p.x<e.x?-1:1;
    if(e.state==='enter'&&e.timer<=0){e.state='idle';e.timer=.7;}
@@ -107,6 +107,7 @@ export class Game{
  updateMini(dt){const b=this.mini;if(b.dead)return;if(this.player.x>2300&&!b.active){b.active=true;b.intro=1.5;this.event('radio','radio3');this.event('notice','mini');this.event('music','boss');}
   if(!b.active)return;b.flash=Math.max(0,b.flash-dt);if(b.intro>0){b.intro-=dt;return;}b.timer-=dt;if(b.timer<=.9&&b.warning===0){b.warning=1;this.effect(b.x,b.y,'warning',2);}if(b.timer<=0){if(b.phase%2===0)this.enemyShot(b,3);else this.grenades.push({x:b.x,y:b.y,vx:-140,vy:-180,timer:1.3,hostile:true,radius:32});b.phase++;b.timer=2.6/this.diff.attack;b.warning=0;}
  }
+ createBoss(){return {x:4090,y:86,w:110,h:124,hp:3800,max:3800,active:true,dead:false,intro:2,timer:1.5,warning:0,pattern:-1,phase:0,flash:0};}
  updateBoss(dt){const b=this.boss;if(!b||b.dead)return;b.flash=Math.max(0,b.flash-dt);if(b.intro>0){b.intro-=dt;return;}
   const phase=b.hp/b.max<.25?2:b.hp/b.max<.65?1:0;if(phase!==b.phase){b.phase=phase;this.event('notice','core');this.effect(b.x+30,b.y+20,'explosion',25);this.event('sound','big');if(phase===2)this.event('radio','radio6');}
   b.timer-=dt;if(b.timer<=0){b.pattern=(b.pattern+1)%3;b.warning=1.1*this.diff.warn;b.targetX=clamp(this.player.x-12,3855,4090);b.timer=b.warning+2.2-(b.phase*.25);b.fired=false;this.event('sound','warn');}
@@ -140,12 +141,12 @@ export class Game{
   for(const item of this.pickups){if(item.taken)continue;if(overlap({x:p.x-4,y:p.y-5,w:p.w+8,h:p.h+10},{x:item.x-8,y:item.y-8,w:16,h:16})){item.taken=true;if(item.type==='weapon')this.pickupWeapon(item.weapon);else{p.grenades=Math.min(12,p.grenades+3);this.event('sound','pickup');this.event('notice','grenade');}}}
   this.updateEnemies(dt);this.updateMini(dt);
   if(this.mini.dead&&this.lastCheckpoint<2&&p.x>2700){this.event('music','mission');this.checkpoint(2);}
-  if(!this.boss&&p.x>3850){this.boss={x:4090,y:86,w:110,h:124,hp:3800,max:3800,active:true,dead:false,intro:2,timer:1.5,warning:0,pattern:-1,phase:0,flash:0};this.crates.push({id:'boss-panel',x:3960,y:191,w:18,h:19,hp:50,kind:'panel'});this.event('notice','boss');this.event('radio','radio5');this.event('music','boss');}
+  if(!this.boss&&p.x>3850){this.boss=this.createBoss();this.crates.push({id:'boss-panel',x:3960,y:191,w:18,h:19,hp:50,kind:'panel'});this.event('notice','boss');this.event('radio','radio5');this.event('music','boss');}
   this.updateBoss(dt);
   for(const b of this.bullets){b.px=b.x;b.py=b.y;b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;if(b.hostile){const hb={x:p.x+3,y:p.y+(p.crouch?17:4),w:p.w-6,h:p.crouch?16:28};if(segmentBox(b.px,b.py,b.x,b.y,hb,b.size*.5)){this.damage();b.life=0;}}else{
     let hit=false;
     for(const e of this.enemies)if(e.hp>0&&segmentBox(b.px,b.py,b.x,b.y,e,b.size)){if(!b.blast)this.hurtEnemy(e,b.damage);hit=true;break;}
-    if(!hit)for(const boss of [this.mini,this.boss])if(boss?.active&&boss.intro<=0&&segmentBox(b.px,b.py,b.x,b.y,boss,b.size)){if(!b.blast)this.hurtBoss(boss,b.damage);hit=true;break;}
+    if(!hit)for(const boss of [this.mini,this.boss])if(boss?.active&&boss.intro<=0&&segmentBox(b.px,b.py,b.x,b.y,boss,b.size)){if(!b.blast)this.hurtBoss(boss,b.damage,{x:b.x,y:b.y});hit=true;break;}
     if(!hit)for(const c of [...this.crates,...this.secrets])if(c.hp>0&&segmentBox(b.px,b.py,b.x,b.y,c,b.size)){if(!b.blast)this.hitObject(c,b.damage);hit=true;break;}
     if(!hit)for(const r of this.rescues)if(!r.free&&segmentBox(b.px,b.py,b.x,b.y,r,b.size)){this.freeRescue(r);hit=true;break;}
     if(hit){b.life=0;if(b.blast)this.explode(b.x,b.y,b.blast,b.damage);}
@@ -157,4 +158,4 @@ export class Game{
   if(!this.flags.fork&&p.x>850){this.flags.fork=true;this.event('radio','radio2');}
  }
 }
-export function validSave(s){return !!s&&s.version===1&&['lia','bento'].includes(s.character)&&Object.hasOwn(DIFFICULTIES,s.difficulty)&&[null,'A','B'].includes(s.route)&&Number.isFinite(s.score)&&s.score>=0&&Number.isFinite(s.time)&&s.time>=0&&s.player&&Number.isFinite(s.player.x)&&s.player.x>=0&&s.player.x<4300&&Number.isFinite(s.player.y)&&s.player.y>=0&&s.player.y<=240&&Number.isInteger(s.player.lives)&&s.player.lives>=0&&s.player.lives<=20&&Array.isArray(s.player.slots)&&s.player.slots.length<=2&&s.player.slots.every(p=>[1,2,3].includes(p.id)&&Number.isFinite(p.ammo)&&p.ammo>=0&&p.ammo<=280)&&['enemies','crates','rescues','secrets','pickups','platforms','rescued','found','scored'].every(k=>Array.isArray(s[k])&&s[k].length<500)&&s.enemies.every(e=>Object.hasOwn(ENEMIES,e.type)&&Number.isFinite(e.x)&&Number.isFinite(e.y)&&Number.isFinite(e.hp))&&s.mini&&s.vehicle&&typeof s.flags==='object'&&Number.isFinite(s.rng);}
+export function validSave(s){return !!s&&s.version===1&&(s.missionId===undefined||[1,2].includes(s.missionId))&&['lia','bento'].includes(s.character)&&Object.hasOwn(DIFFICULTIES,s.difficulty)&&[null,'A','B'].includes(s.route)&&Number.isFinite(s.score)&&s.score>=0&&Number.isFinite(s.time)&&s.time>=0&&s.player&&Number.isFinite(s.player.x)&&s.player.x>=0&&s.player.x<4300&&Number.isFinite(s.player.y)&&s.player.y>=0&&s.player.y<=240&&Number.isInteger(s.player.lives)&&s.player.lives>=0&&s.player.lives<=20&&Array.isArray(s.player.slots)&&s.player.slots.length<=2&&s.player.slots.every(p=>[1,2,3].includes(p.id)&&Number.isFinite(p.ammo)&&p.ammo>=0&&p.ammo<=280)&&['enemies','crates','rescues','secrets','pickups','platforms','rescued','found','scored'].every(k=>Array.isArray(s[k])&&s[k].length<500)&&s.enemies.every(e=>Object.hasOwn(ENEMIES,e.type)&&Number.isFinite(e.x)&&Number.isFinite(e.y)&&Number.isFinite(e.hp))&&s.mini&&s.vehicle&&typeof s.flags==='object'&&Number.isFinite(s.rng);}

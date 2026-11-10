@@ -1,3 +1,16 @@
+# v0.2.0 — Trilho Partido
+
+- Segunda missão autoral com seis trechos, duas rotas, sete resgates e três segredos.
+- Atiradores, paraquedistas, elite Cinza; Mula de Aço com minas, Baldo e Locomotiva Moloch.
+- Vapor/válvulas, tráfego anunciado, passarela móvel e três vagões no referencial do trem.
+- Briefing/epílogo ilustrados, PT-BR/EN e três cues musicais originais.
+- Seleção/desbloqueio de missões, encadeamento M1→M2, save compatível e regulador de engenharia persistente.
+- Correções: inimigos fora da câmera não atiram; replay não herda timer de vitória.
+- 47 testes e dez cenários Chromium em localhost. QA de publicação registrado separadamente.
+- Missões 3–8, coop, finais completos e certificação de hardware seguem fora.
+
+---
+
 # v0.1.0 — Baía Cobre
 
 Primeira versão pública, vertical slice da Missão 1. Núcleo de combate, duas rotas, Lia/Bento, quatro armas, granadas, seis inimigos, Besouro-9, Balde de Ferro e Dragão-Guindaste. Menus, localização, opções, save e narrativa curta. Arte e áudio procedurais originais.

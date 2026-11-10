@@ -64,3 +64,6 @@ Leitura e planejamento concluídos. Nenhuma implementação, certificação, med
 
 ## Decisão executada — versão 0.1.0
 A análise acima foi escrita antes da implementação. Depois da autorização explícita para desenvolvimento local, foi construído o slice da Missão 1, não uma suposta campanha de oito missões. O estado atual, limites e testes realmente executados estão em README.md, docs/RELEASE_NOTES.md e docs/QA.md. Foram aprovados 30 testes de lógica (incluindo as duas rotas até os resultados) e cinco cenários Chromium headless. Coop, missões adicionais, dublagem e certificação de performance/hardware continuam pendentes.
+
+## Expansão autorizada — Missão 2 / v0.2.0
+Foi analisado o capítulo 10.2 e seus catálogos relacionados antes da expansão. O novo capítulo foi construído como cenário próprio: ferrovia, depósito, manutenção/telhados, Mula, Baldo, vagões e Moloch, com objetivos de engenharia persistentes. O detalhamento e as adaptações (percurso compacto, trem em referencial relativo, sem coop) estão em docs/MISSAO-02.md. M1 continua disponível e foi submetida novamente à regressão.
