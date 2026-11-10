@@ -7,6 +7,6 @@
 - Zero erros runtime/rejeições/console/HTTP detectados pelos harnesses. Boot e API são verificados; capturas foram inspecionadas visualmente.
 - Benchmark com relógio real, separado de testes de tempo virtual: 120 submissões Canvas por missão em cena de boss com 260 partículas e dez explosões. Não mede FPS de apresentação.
 - Evidências locais: `polish/QA-LOGIC.txt`, `QA-M1-LOCAL.json`, `QA-M2-LOCAL.json`, `QA-POLISH-LOCAL.json`, `QA-PERF-LOCAL.json`. Capturas antes/depois em `/workspace/brasa-shots/polish/`.
-- Evidência pós-deploy será registrada em PUBLICACAO.md e `polish/QA-*-PUBLICO.json` depois da execução remota.
+- Os onze cenários passaram também na URL pública, assim como o benchmark real separado. Evidência pós-deploy em PUBLICACAO.md e `polish/QA-*-PUBLICO.json`.
 
 Nenhuma alegação de certificação de 60 FPS, áudio ouvido, hardware/gamepad físico, playtest humano, coop ou campanha completa. Revisão detalhada em POLIMENTO.md; evidência histórica v0.1/v0.2 em `archive/`.
