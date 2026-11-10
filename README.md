@@ -6,6 +6,8 @@ Um run-and-gun 2D original sobre uma brigada de pilotos e mecânicos no arquipé
 
 **Jogar:** https://luispauloalves500.github.io/brasa-de-aco/
 
+![Fogo no Mangue: captura da versão pública](docs/screenshots/mangue.png)
+
 ## O que esta versão entrega
 
 - Missão autoral com praia, passarelas, bifurcação Palafitas/Canais, oficina, trecho de blindado e cais militar.
