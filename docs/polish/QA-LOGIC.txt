@@ -1,0 +1,81 @@
+
+> brasa-de-aco@0.3.0 test
+> node --test tests/*.test.mjs
+
+{"route":"A","seconds":73,"deaths":0,"continues":0,"rescues":7,"score":100520}
+{"route":"B","seconds":86,"deaths":1,"continues":0,"rescues":6,"score":78350}
+✔ campanha simulada da praia aos resultados pela rota A (232.433411ms)
+✔ campanha simulada da praia aos resultados pela rota B (165.418695ms)
+✔ RNG reproduzível e intervalo correto (12.740497ms)
+✔ swept colisão detecta projétil através de objeto fino (0.235749ms)
+✔ estado inicial, fallback infinito e três dificuldades (4.829776ms)
+✔ deslocamento independe de 30/60/120 renderizações (10.629327ms)
+✔ salto variável e aterrissagem (4.061045ms)
+✔ jump buffer registra e coyote time permite borda (0.440652ms)
+✔ armas consomem munição e fallback é automático (0.724916ms)
+✔ cadência usa relógio de simulação (5.125133ms)
+✔ mira alta e diagonal normalizadas (1.074971ms)
+✔ granadas limitadas, arco e explosão (2.577875ms)
+✔ melee contextual, escudo e explosivo (0.419454ms)
+✔ dois slots e reabastecimento respeitam capacidade (0.968297ms)
+✔ ambas as rotas alteram geometria e encontros, sem duplicar primeiro setor (0.800812ms)
+✔ resgates e segredos não duplicam pontuação (0.250985ms)
+✔ morte restaura checkpoint sem duplicar recompensas (1.08774ms)
+✔ continue restaura reservas e preserva rota (0.386189ms)
+✔ escudo protege exatamente um impacto (0.284602ms)
+✔ veículo entra/sai e destruição permite ejeção segura (2.12041ms)
+✔ Bento recebe 10% menos dano no veículo (0.366587ms)
+✔ IA tem estado enter e telegráfico antes de atacar (1.034926ms)
+✔ minichefe derrotado libera progressão e recompensa (0.305999ms)
+✔ chefe intro invulnerável, fases e remoção de ameaças (0.465367ms)
+✔ chefe cria os três padrões com aviso (0.566288ms)
+✔ pausa congela simulação e contador (0.224782ms)
+✔ save serializa, valida checksum e rejeita corrupção (2.866386ms)
+✔ localização tem chaves PT/EN equivalentes (0.138012ms)
+✔ catálogo da fase referencia somente inimigos conhecidos (0.125583ms)
+✔ projéteis e partículas lógicas têm limite de vida (0.325761ms)
+✔ mira em oito direções é unitária e atualiza mesmo sem atirar (7.107177ms)
+✔ oito octantes do atlas cobrem todos os ângulos (0.132971ms)
+✔ poses cobrem idle/corrida/ar/agachar/granada/melee/dano/morte/vitória (1.324008ms)
+✔ Lia e Bento têm paletas próprias, sem mutação global (0.809914ms)
+✔ armas e metralhadora possuem cues sonoras distintas (0.733159ms)
+✔ feedback de tiro e granada expira sem alterar cadência (2.859499ms)
+✔ escudo bloqueia pela frente mas não pelas costas (0.398869ms)
+✔ no máximo dois inimigos anunciam ataques ao mesmo tempo (0.349553ms)
+✔ franco-atirador mantém ponto anunciado em vez de rastrear no disparo (1.236529ms)
+✔ câmera olha adiante sem alterar posição física (0.52061ms)
+✔ recupera backup válido e preserva checkpoint corrompido (2.791626ms)
+✔ backup 2 é usado se backup 1 também está inválido (0.506131ms)
+✔ armazenamento bloqueado não derruba a partida (0.921012ms)
+✔ gamepad em slot não zero e Shift direito funcionam (0.401844ms)
+✔ fonte cobre HUD e normaliza acentos (0.213485ms)
+✔ preferência de movimento reduzido do sistema é respeitada sem sobrepor escolha salva (0.151227ms)
+✔ esteiras acompanham deslocamento e param com veículo estacionado (2.141689ms)
+✔ resgate emite recompensa somente uma vez e preserva placar (0.710414ms)
+{"mission":2,"route":"A","seconds":81,"deaths":0,"continues":0,"rescues":7,"regulator":true,"score":98985}
+{"mission":2,"route":"B","seconds":84,"deaths":0,"continues":0,"rescues":6,"regulator":false,"score":91945}
+✔ M2 possui layout e inimigos próprios, sete resgates e três segredos (1.42034ms)
+✔ Mula entra antes de Baldo e lança minas, não obus (1.082651ms)
+✔ mina detona por proximidade e possui timeout (4.553015ms)
+✔ resgate mais componente exigidos para regulador, em qualquer ordem (3.462255ms)
+✔ objetivo não desaparece após morte/continue e round-trip de save (2.111459ms)
+✔ valvulas interrompem perigo de vapor (0.426912ms)
+✔ plataforma móvel carrega jogador sem alterar velocidade de física (0.716476ms)
+✔ pausa congela plataformas móveis e perigos (0.528757ms)
+✔ paraquedista desce e franco-atirador dá aviso (0.450321ms)
+✔ Moloch tem 3 padrões, fases 70/30 e colapso real de plataformas (1.383971ms)
+✔ reiniciar uma missão concluída não herda timer de vitória (0.911314ms)
+✔ localização M2 equivalente e sem strings vazias (1.204191ms)
+✔ campanha persiste desbloqueio, engenharia e migra recorde legado (0.442558ms)
+✔ M2 bot integral, rota A, sem teleporte ou dano artificial (226.577573ms)
+✔ M2 bot integral, rota B, sem teleporte ou dano artificial (100.772026ms)
+✔ inimigo fora da câmera não atira pelas costas (0.516434ms)
+✔ colapso remove colisão e caminhonete precisa ser deixada antes do trem (0.948195ms)
+ℹ tests 65
+ℹ suites 0
+ℹ pass 65
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 473.335833

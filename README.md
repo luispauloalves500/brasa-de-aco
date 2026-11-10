@@ -1,19 +1,32 @@
 # BRASA DE AÇO — OPERAÇÃO HORIZONTE
 
-**v0.2.0 · Duas missões jogáveis · Solo · PT-BR / EN**
+**v0.3.0 · Duas missões jogáveis · Solo · PT-BR / EN**
 
 Run-and-gun 2D original no arquipélago de Aurora Sul. Pixel art procedural, música e efeitos WebAudio originais, sem CDNs, conta ou servidor de partida. Não usa sprites, melodias ou gravações de jogos da SNK.
 
 **Jogar:** https://luispauloalves500.github.io/brasa-de-aco/
 
-![Trilho Partido — Mula de Aço contra Baldo](docs/m2/mula.png)
+![Antes/depois — polimento das duas missões](docs/polish/comparacao.png)
+
+## Polimento visual e funcional — NOVO
+
+- Lia/Bento com paletas, retratos, oito frames de corrida, mira em oito direções e poses de salto, agachar, tiro, granada, melee, dano, morte e vitória.
+- Inimigos mais expressivos; novos detalhes de máquinas, esteiras ligadas ao movimento, rodas/pistões, danos e fumaça; chefes com painéis, rebites e partes móveis.
+- Mangue ao pôr do sol, água com brilhos/reflexos, árvores e palafitas; ferrovia com vila, tanques de combustível, oficinas de telhado serrilhado, túnel e estação. Paralaxe, aves, névoa, vapor e partículas.
+- Explosões em camadas, cápsulas, destroços, hitstop breve, recoil visual, pickups desenhados e recompensas flutuantes; HUD emoldurado e fonte pixel **Brasa Circuit** original/local.
+- Mira atualiza sem disparar; câmera antecipa movimento; pressão limitada a dois avisos de inimigos; atiradores miram no ponto anunciado; escudos protegem pela frente, não pelas costas.
+- Sons distintos por arma, prioridade de alertas, música com mix/percussão ajustados e redução temporária sob explosões. SFX silenciam na pausa.
+- Recuperação automática de backup válido, preservando save corrompido; remapeamento não aceita aliases conflitantes; gamepads em slots não zero, Shift direito e toque remapeado.
+- Detalhe de efeitos ajustável, preferência do sistema por movimento reduzido, redução de flashes/hitstop e anúncios de eventos para leitores de tela.
+
+Veja [revisão completa](docs/POLIMENTO.md) e [estudo de animações](docs/polish/personagens.png). Nenhuma missão nova foi adicionada nesta atualização.
 
 ## Campanha disponível
 
 ### 01 · Fogo no Mangue
 Praia, palafitas/canais, oficina, Besouro-9 e cais. Oito resgates, três segredos, Balde de Ferro e Dragão-Guindaste. Lia Torv ou Bento Arcos; pistola M-7, Carabina Cascata, Espingarda Cobalto, Lança-foguetes Faísca, granadas e melee. Todos os sistemas da primeira versão permanecem disponíveis.
 
-### 02 · Trilho Partido — NOVA
+### 02 · Trilho Partido
 - Vila ferroviária em dois níveis, depósito de combustível, válvulas de vapor e explosões em cadeia.
 - **Túnel de manutenção:** escudeiros, elite Cinza, engenheira e console do regulador.
 - **Telhados das oficinas:** paraquedistas, atiradores e passarela móvel que carrega o jogador.
@@ -39,7 +52,7 @@ A vitória na missão 1 libera a missão 2 e oferece acesso direto ao briefing s
 | Granada; obus no Besouro; minas na Mula | L | B / ○ |
 | Trocar arma (inclui pistola) | Q | Y / △ |
 | Libertar / válvula / console / veículo | E | RB |
-| Esquiva | Shift | RT |
+| Esquiva | Shift esquerdo/direito | RT |
 | Pausa | Esc / P | Menu |
 | Objetivos | Tab | View |
 
@@ -51,7 +64,7 @@ Teclado remapeável nas opções; prompts compactos mostram as teclas padrão. G
 
 Três dificuldades, mira/escudo assistidos, melee opcional, volume mestre/música/SFX, mono, tremor e flashes/movimento reduzidos. Assistências separam os recordes. Música é liberada após interação. O jogo pausa ao perder foco.
 
-Checkpoint e campanha ficam no navegador, sem envio a servidores. Saves têm checksum e backups; save inválido é preservado antes de uma nova operação. Limpar dados do site remove o progresso. Uma nova operação substitui o checkpoint ativo, mas não rebaixa capítulos já concluídos nem o registro de engenharia. Não há importação/exportação ou cloud save nesta versão.
+Checkpoint e campanha ficam no navegador, sem envio a servidores. Saves têm checksum e backups; save inválido é preservado e, havendo backup válido, ele é recuperado automaticamente. Limpar dados do site remove o progresso. Uma nova operação substitui o checkpoint ativo, mas não rebaixa capítulos já concluídos nem o registro de engenharia. Não há importação/exportação ou cloud save nesta versão.
 
 ## Escopo real
 
@@ -64,7 +77,7 @@ As duas missões são adaptações compactas e autorais do GDD, não uma campanh
 ```sh
 python3 -m http.server 8089
 # abrir http://localhost:8089/
-npm test  # Node 20+; 47 testes
+npm test  # Node 20+; 65 testes
 ```
 
 Nenhum build ou dependência em runtime: o bundle versionado já está no repositório. Pages publica `main`, raiz, com `.nojekyll`. Use servidor estático também em desenvolvimento.
@@ -74,6 +87,10 @@ Para alterar fontes: `npm ci && npm run build`. O esbuild é apenas ferramenta d
 ```sh
 BASE=http://127.0.0.1:8089 CHROME=/caminho/chrome-headless-shell bash tools/browser-qa.sh
 BASE=http://127.0.0.1:8089 CHROME=/caminho/chrome-headless-shell bash tools/rail-browser-qa.sh
+BASE=http://127.0.0.1:8089 CHROME=/caminho/chrome-headless-shell bash tools/polish-browser-qa.sh
+BASE=http://127.0.0.1:8089 CHROME=/caminho/chrome-headless-shell bash tools/perf-browser-qa.sh
 ```
 
 Os harnesses usam navegadores headless isolados e `?qa=1`, sem sessões pessoais. Bots usam inputs e regras normais; não substituem playtest humano. Leia [análise](ANALISE.md), [GDD original](docs/GDD.md), [implementação M2](docs/MISSAO-02.md), [QA](docs/QA.md), [publicação](docs/PUBLICACAO.md) e [changelog](docs/RELEASE_NOTES.md).
+
+Fonte dos menus: `assets/brasa-circuit.ttf`, original, gerada de `src/pixel-font.js` / `assets/glyphs.json` por `tools/generate-font.py` (fontTools apenas para regeneração). Os sprites são rasterizados em frames locais e mantidos em cache; nenhum asset externo é carregado.

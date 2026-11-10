@@ -5,7 +5,7 @@ BASE=${BASE:-http://127.0.0.1:8087}; OUT=${OUT:-/workspace/brasa-shots/m2}
 mkdir -p "$OUT"
 for pair in village:01-vila roofs:02-telhados truck:03-mula boss:04-moloch finish:05-continuar; do
  scene=${pair%%:*}; name=${pair#*:}; profile=$(mktemp -d /tmp/brasa-m2.XXXXXX)
- timeout 40 "$CHROME" --no-sandbox --disable-dev-shm-usage --no-proxy-server --user-data-dir="$profile" --window-size=1280,800 --screenshot="$OUT/$name.png" --virtual-time-budget=1800 --dump-dom "$BASE/tests/rail-browser.html?scene=$scene" > "$OUT/$scene-dom.log" 2> "$OUT/$scene-browser.log"
+ timeout 40 "$CHROME" --no-sandbox --disable-dev-shm-usage --no-proxy-server --user-data-dir="$profile" --window-size=1280,800 --screenshot="$OUT/$name.png" --virtual-time-budget=6000 --dump-dom "$BASE/tests/rail-browser.html?scene=$scene" > "$OUT/$scene-dom.log" 2> "$OUT/$scene-browser.log"
 done
 python3 - "$OUT" <<'PY'
 import sys,re,json,html

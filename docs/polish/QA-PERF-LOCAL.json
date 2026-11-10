@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "clock": "real wall clock / isolated headless Chromium",
+  "scope": "Canvas CPU submission only; excludes display/GPU vsync and does not certify player hardware FPS",
+  "results": [
+    {
+      "mission": 1,
+      "meanMS": 3.8183333333581686,
+      "p95MS": 7.899999991059303,
+      "samples": 120,
+      "particles": 260,
+      "bursts": 10,
+      "spriteCache": 2,
+      "surfaceCache": 11
+    },
+    {
+      "mission": 2,
+      "meanMS": 3.7600000000248355,
+      "p95MS": 6.799999997019768,
+      "samples": 120,
+      "particles": 260,
+      "bursts": 10,
+      "spriteCache": 2,
+      "surfaceCache": 17
+    }
+  ]
+}

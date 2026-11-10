@@ -67,3 +67,6 @@ A análise acima foi escrita antes da implementação. Depois da autorização e
 
 ## Expansão autorizada — Missão 2 / v0.2.0
 Foi analisado o capítulo 10.2 e seus catálogos relacionados antes da expansão. O novo capítulo foi construído como cenário próprio: ferrovia, depósito, manutenção/telhados, Mula, Baldo, vagões e Moloch, com objetivos de engenharia persistentes. O detalhamento e as adaptações (percurso compacto, trem em referencial relativo, sem coop) estão em docs/MISSAO-02.md. M1 continua disponível e foi submetida novamente à regressão.
+
+## Revisão autorizada — v0.3.0
+O pedido seguinte priorizou cenários, personagens, sprites e funções já existentes. A expansão foi suspensa: continuam somente M1/M2. A revisão preserva colisões, dano e cadências, melhora a apresentação e corrige mira, escudos, avisos, câmera, input e persistência. A direção de arte, sistemas revisados, testes e limites estão em docs/POLIMENTO.md. As metas de performance são tratadas como metas: benchmark de submissão Canvas não substitui medição de FPS no equipamento do jogador.

@@ -6,7 +6,7 @@ OUT=${OUT:-/workspace/brasa-shots}
 mkdir -p "$OUT"
 for pair in menu:01-hangar mangrove:02-mangue channels:03-canais boss:04-chefe finish:05-epilogo; do
  scene=${pair%%:*}; name=${pair#*:}; profile=$(mktemp -d /tmp/brasa-qa.XXXXXX)
- timeout 30 "$CHROME" --no-sandbox --disable-dev-shm-usage --no-proxy-server --user-data-dir="$profile" --window-size=1280,800 --screenshot="$OUT/$name.png" --virtual-time-budget=1800 --dump-dom "$BASE/tests/browser.html?scene=$scene" > "$OUT/$scene-dom.log" 2> "$OUT/$scene-browser.log"
+ timeout 30 "$CHROME" --no-sandbox --disable-dev-shm-usage --no-proxy-server --user-data-dir="$profile" --window-size=1280,800 --screenshot="$OUT/$name.png" --virtual-time-budget=6000 --dump-dom "$BASE/tests/browser.html?scene=$scene" > "$OUT/$scene-dom.log" 2> "$OUT/$scene-browser.log"
 done
 python3 - "$OUT" <<'PY'
 import sys,re,json,html

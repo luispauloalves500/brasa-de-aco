@@ -54,7 +54,7 @@ export class RailGame extends Game{
   super.updateEnemies(dt);
   for(const e of this.enemies)if(e.type==='elite'&&e.hp>0&&e.state==='recover'&&e.timer>1.5&&Math.abs(e.x-this.player.x)<230)e.x-=e.facing*18*dt;
  }
- enemyShot(e,spread=1){if(e.type==='sniper'){const p=this.player,dx=p.x-e.x,dy=p.y+18-(e.y+12),d=Math.hypot(dx,dy)||1;this.bullets.push({x:e.x+9,y:e.y+12,vx:dx/d*175*this.diff.bullet,vy:dy/d*175*this.diff.bullet,life:3,damage:1,hostile:true,size:3,color:'#ff6651'});this.event('sound','enemy');}else super.enemyShot(e,e.type==='elite'?2:spread);}
+ enemyShot(e,spread=1){if(e.type==='sniper'){const p=this.player,dx=(e.lockX??p.x+9)-(e.x+9),dy=(e.lockY??p.y+18)-(e.y+12),d=Math.hypot(dx,dy)||1;this.bullets.push({x:e.x+9,y:e.y+12,vx:dx/d*175*this.diff.bullet,vy:dy/d*175*this.diff.bullet,life:3,damage:1,hostile:true,size:3,color:'#ff6651'});this.event('sound','enemy');}else super.enemyShot(e,e.type==='elite'?2:spread);}
  updateMini(dt){const b=this.mini;if(b.dead)return;if(this.player.x>2280&&!b.active){b.active=true;b.intro=1.7;this.event('radio','radio3');this.event('notice','mini');this.event('music','boss');}if(!b.active)return;b.flash=Math.max(0,b.flash-dt);if(b.intro>0){b.intro-=dt;return;}b.timer-=dt;if(b.timer<1&&b.warning===0){b.warning=1;this.event('sound','warn');}
   if(b.timer<=0){if(b.phase%3===0)this.enemyShot(b,4);else if(b.phase%3===1){this.grenades.push({x:b.x+20,y:b.y,vx:-110,vy:-190,timer:1.5,hostile:true,radius:30,damage:1});}else this.railHazards.push({type:'shell',x:clamp(this.player.x-15,2200,2440),y:170,w:30,h:40,warning:1.25,life:1.6});b.phase++;b.timer=3/this.diff.attack;b.warning=0;}
  }

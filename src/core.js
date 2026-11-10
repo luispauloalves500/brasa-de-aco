@@ -8,6 +8,7 @@ export function segmentBox(x1,y1,x2,y2,b,pad=0){
   let a=(min-p)/d,c=(max-p)/d;if(a>c)[a,c]=[c,a];lo=Math.max(lo,a);hi=Math.min(hi,c);if(lo>hi)return false;
  }return true;
 }
+export function aimFor(input={},p={face:1,ground:true}){let x=p.face||1,y=0;if(input.up){y=-1;x=input.left?-1:input.right?1:0;}else if(input.down&&!p.ground){y=1;x=input.left?-1:input.right?1:0;}const n=Math.hypot(x,y)||1;return {x:x/n,y:y/n};}
 export class RNG{constructor(seed=12345){this.seed=seed>>>0}next(){let x=this.seed;x^=x<<13;x^=x>>>17;x^=x<<5;this.seed=x>>>0;return this.seed/4294967296}}
 const clone=v=>JSON.parse(JSON.stringify(v));
 export function level(route=null){
@@ -39,7 +40,7 @@ export class Game{
  addScore(id,base){if(this.scored.includes(id))return;this.scored.push(id);this.combo=Math.min(5,this.combo+1);this.comboTime=8;this.score+=Math.round(base*(1+this.combo*.3));}
  effect(x,y,type='spark',count=5){this.event('fx',{x,y,type,count});}
  capture(){return clone({version:1,character:this.character,difficulty:this.difficulty,route:this.route,time:this.time,score:this.score,deaths:this.deaths,continues:this.continues,rescued:this.rescued,found:this.found,scored:this.scored,flags:this.flags,lastCheckpoint:this.lastCheckpoint,player:this.player,platforms:this.platforms,enemies:this.enemies,crates:this.crates,rescues:this.rescues,secrets:this.secrets,pickups:this.pickups,mini:this.mini,vehicle:this.vehicle,boss:this.boss,rng:this.rng.seed})}
- load(data){if(!validSave(data))throw Error('Invalid save');this.reset(data.character,data.difficulty);Object.assign(this,clone(data));this.diff=DIFFICULTIES[this.difficulty];this.rng=new RNG(data.rng);this.bullets=[];this.grenades=[];this.hazards=[];this.player.inv=1.8;this.player.dead=0;this.camera=clamp(this.player.x-165,0,3840);this.snapshot=clone(data);this.done=false;this.gameover=false;this.state='play';}
+ load(data){if(!validSave(data))throw Error('Invalid save');this.reset(data.character,data.difficulty);Object.assign(this,clone(data));this.diff=DIFFICULTIES[this.difficulty];this.rng=new RNG(data.rng);this.bullets=[];this.grenades=[];this.hazards=[];this.player.inv=1.8;this.player.dead=0;this.camera=clamp(this.player.x-165,0,3840);this.snapshot=clone(data);this.done=false;this.gameover=false;this.winTimer=0;this.state='play';}
  checkpoint(id){this.lastCheckpoint=id;this.player.inv=2;this.player.shield=this.options.shield?1:this.player.shield;this.snapshot=this.capture();this.event('checkpoint',this.snapshot);this.event('notice','checkpoint');}
  restore(continued=false){
   const keep={score:this.score,rescued:[...this.rescued],found:[...this.found],scored:[...this.scored],deaths:this.deaths,time:this.time,continues:this.continues+(continued?1:0),lives:continued?this.diff.lives:this.player.lives};
@@ -50,29 +51,29 @@ export class Game{
  gun(){return this.player.slot<0?WEAPONS[0]:WEAPONS[this.player.slots[this.player.slot]?.id||0]}
  pickupWeapon(id){const p=this.player;let s=p.slots.find(s=>s.id===id);if(s)s.ammo=Math.min(WEAPONS[id].ammo,s.ammo+Math.ceil(WEAPONS[id].ammo*.6));else {s={id,ammo:WEAPONS[id].ammo};if(p.slots.length<2)p.slots.push(s);else p.slots[p.slot<0?0:p.slot]=s;}p.slot=p.slots.indexOf(s);this.event('weapon',WEAPONS[id].name);this.event('sound','pickup');}
  shoot(input){const p=this.player;if(p.shoot>0||p.dead)return;
-  let dx=p.face,dy=0;if(input.up){dy=-1;dx=input.left?-1:input.right?1:0;}else if(input.down&&!p.ground){dy=1;dx=input.left?-1:input.right?1:0;}
+  let {x:dx,y:dy}=aimFor(input,p);
   if(this.options.assist&&dy===0){let targets=this.enemies.filter(e=>e.hp>0&&Math.abs(e.x-p.x)<200&&(e.x-p.x)*p.face>0);if(this.boss)targets.push(this.boss);const t=targets.sort((a,b)=>Math.abs(a.x-p.x)-Math.abs(b.x-p.x))[0];if(t&&Math.abs(t.y+t.h*.5-(p.y+15))<40){dy=(t.y+t.h*.5-p.y-15)/Math.max(80,Math.abs(t.x-p.x));}}
   const mag=Math.hypot(dx,dy);dx/=mag;dy/=mag;p.aimX=dx;p.aimY=dy;
   if(this.options.melee&&!p.vehicle&&this.enemies.some(e=>e.hp>0&&Math.abs(e.x-p.x)<32&&(e.x-p.x)*p.face>0&&Math.abs(e.y-p.y)<32)){
-   for(const e of this.enemies)if(e.hp>0&&Math.abs(e.x-p.x)<34&&(e.x-p.x)*p.face>0&&Math.abs(e.y-p.y)<35)this.hurtEnemy(e,100,'melee');p.shoot=.35;p.melee=.2;this.event('sound','melee');return;
+   for(const e of this.enemies)if(e.hp>0&&Math.abs(e.x-p.x)<34&&(e.x-p.x)*p.face>0&&Math.abs(e.y-p.y)<35)this.hurtEnemy(e,100,'melee');p.shoot=.35;p.melee=.2;this.event('impact',.035);this.event('sound','melee');return;
   }
   let gun=p.vehicle?{...WEAPONS[1],damage:10,ammo:Infinity}:this.gun();if(p.vehicle&&this.vehicle.critical>0)return;
-  p.shoot=gun.interval;const y=p.vehicle?p.y+7:p.y+(p.crouch?24:14),x=p.x+p.w*.5+dx*(p.vehicle?25:14);this.effect(x,y,'muzzle',3);
+  p.shoot=gun.interval;p.shotFlash=.075;p.recoil=.09;const y=p.vehicle?p.y+7:p.y+(p.crouch?24:14),x=p.x+p.w*.5+dx*(p.vehicle?25:14);this.effect(x,y,'muzzle',3);
   for(let i=0;i<(gun.pellets||1);i++){let angle=Math.atan2(dy,dx)+(gun.pellets?(i-3)*.075:0);this.bullets.push({x,y,px:x,py:y,vx:Math.cos(angle)*gun.speed,vy:Math.sin(angle)*gun.speed,life:gun.blast?6:1.4,damage:gun.damage,hostile:false,size:gun.size,color:gun.color,blast:gun.blast||0});}
   if(!p.vehicle&&p.slot>=0){const slot=p.slots[p.slot];slot.ammo--;if(slot.ammo<=0){p.slots.splice(p.slot,1);p.slot=-1;this.event('notice','M-7');}}
-  this.event('sound',gun.id===3?'rocket':gun.id===2?'shotgun':'shot');
+  this.event('sound',p.vehicle?'machine':gun.id===3?'rocket':gun.id===2?'shotgun':gun.id===1?'carbine':'shot');
  }
- throwGrenade(){const p=this.player;if(p.grenade>0||p.dead)return;if(p.vehicle){p.grenade=1.5;this.grenades.push({x:p.x+25*p.face,y:p.y+8,vx:190*p.face,vy:-150,timer:.9,hostile:false,damage:90,radius:48});this.event('sound','grenade');return;}if(p.grenades<1)return;p.grenades--;p.grenade=.55;this.grenades.push({x:p.x+10,y:p.y+8,vx:140*p.face+p.vx*.4,vy:-200,timer:1.2,hostile:false,damage:180,radius:52});this.event('sound','grenade');}
+ throwGrenade(){const p=this.player;if(p.grenade>0||p.dead)return;if(p.vehicle){p.grenade=1.5;this.grenades.push({x:p.x+25*p.face,y:p.y+8,vx:190*p.face,vy:-150,timer:.9,hostile:false,damage:90,radius:48});this.event('sound','grenade');return;}if(p.grenades<1)return;p.grenades--;p.grenade=.55;p.throwPose=.24;this.grenades.push({x:p.x+10,y:p.y+8,vx:140*p.face+p.vx*.4,vy:-200,timer:1.2,hostile:false,damage:180,radius:52});this.event('sound','grenade');}
  hurtEnemy(e,damage,kind='bullet'){
-  if(e.hp<=0)return;if(e.type==='shield'&&kind==='bullet'&&this.player.x<e.x&&this.player.y+20>e.y+8){damage*=.25;this.effect(e.x,e.y+10,'spark',4);}
-  e.hp-=damage;e.flash=.09;this.effect(e.x+e.w/2,e.y+e.h/2,'hit',4);this.event('sound','hit');if(e.hp<=0){this.addScore(e.id,ENEMIES[e.type].score);this.effect(e.x+e.w/2,e.y+e.h/2,e.type==='tank'||e.type==='turret'?'explosion':'defeat',12);this.event('sound',e.type==='tank'?'boom':'defeat');}
+  if(e.hp<=0)return;if(e.type==='shield'&&kind==='bullet'&&(this.player.x-e.x)*(e.facing||-1)>0&&this.player.y+20>e.y+8){damage*=.25;this.effect(e.x,e.y+10,'spark',4);}
+  e.hp-=damage;e.flash=.09;this.effect(e.x+e.w/2,e.y+e.h/2,'hit',4);this.event('sound','hit');if(e.hp<=0){this.addScore(e.id,ENEMIES[e.type].score);this.event('actorDefeat',{x:e.x,y:e.y,type:e.type,face:e.facing});this.event('impact',kind==='melee'?.035:.022);this.effect(e.x+e.w/2,e.y+e.h/2,e.type==='tank'||e.type==='turret'?'explosion':'defeat',12);this.event('sound',e.type==='tank'?'boom':'defeat');}
  }
- hurtBoss(b,damage){if(!b||!b.active||b.dead||b.intro>0)return;b.hp-=damage;b.flash=.08;this.effect(b.x+b.w*.5,b.y+b.h*.5,'spark',3);if(b.hp<=0){b.hp=0;b.dead=true;b.active=false;this.bullets=this.bullets.filter(t=>!t.hostile);this.hazards=[];this.grenades=this.grenades.filter(t=>!t.hostile);this.addScore(b===this.mini?'mini':'boss',b===this.mini?5000:15000);this.effect(b.x+b.w/2,b.y+b.h/2,'big',50);this.event('sound','big');if(b===this.mini){this.event('radio','radio4');this.pickups.push({id:'minidrop',x:b.x,y:185,type:'weapon',weapon:3});}else{this.winTimer=3;this.player.inv=10;this.event('music','victory');}}
+ hurtBoss(b,damage){if(!b||!b.active||b.dead||b.intro>0)return;b.hp-=damage;b.flash=.08;this.effect(b.x+b.w*.5,b.y+b.h*.5,'spark',3);if(b.hp<=0){b.hp=0;b.dead=true;b.active=false;this.event('impact',.06);this.bullets=this.bullets.filter(t=>!t.hostile);this.hazards=[];this.grenades=this.grenades.filter(t=>!t.hostile);this.addScore(b===this.mini?'mini':'boss',b===this.mini?5000:15000);this.effect(b.x+b.w/2,b.y+b.h/2,'big',50);this.event('sound','big');if(b===this.mini){this.event('radio','radio4');this.pickups.push({id:'minidrop',x:b.x,y:185,type:'weapon',weapon:3});}else{this.winTimer=3;this.player.inv=10;this.event('music','victory');}}
  }
  damage(){const p=this.player;if(p.inv>0||p.dead||this.done||this.winTimer||this.boss?.intro>0||(this.mini.active&&this.mini.intro>0))return;
   if(p.vehicle){this.vehicle.hp-=this.character==='bento'?27:30;p.inv=.55;this.effect(p.x,p.y,'spark',9);if(this.vehicle.hp<=0&&this.vehicle.critical===0){this.vehicle.critical=2;this.event('notice','eject');}this.event('sound','metal');return;}
-  if(p.shield){p.shield=0;p.inv=1.8;this.effect(p.x,p.y,'shield',12);this.event('sound','metal');return;}
-  p.lives--;this.deaths++;p.dead=1.2;p.vx=0;this.combo=0;this.effect(p.x,p.y,'defeat',12);this.event('sound','death');
+  if(p.shield){p.shield=0;p.inv=1.8;p.hurtPose=.24;this.event('impact',.025);this.effect(p.x,p.y,'shield',12);this.event('sound','metal');return;}
+  p.lives--;this.deaths++;p.dead=1.2;p.hurtPose=.3;this.event('impact',.04);p.vx=0;this.combo=0;this.effect(p.x,p.y,'defeat',12);this.event('sound','death');
  }
  explode(x,y,radius,damage,hostile=false){this.effect(x,y,'explosion',22);this.event('sound','boom');if(hostile){if(Math.hypot(this.player.x+9-x,this.player.y+18-y)<radius)this.damage();return;}
   for(const e of this.enemies)if(e.hp>0&&Math.hypot(e.x+e.w/2-x,e.y+e.h/2-y)<radius+e.w/2)this.hurtEnemy(e,damage,'explosion');
@@ -81,7 +82,7 @@ export class Game{
   for(const r of this.rescues)if(!r.free&&Math.hypot(r.x-x,r.y-y)<radius)this.freeRescue(r);
  }
  hitObject(c,damage){if(c.hp<=0)return;c.hp-=damage;if(c.hp>0)return;this.effect(c.x+10,c.y+8,'debris',10);if(c.kind==='panel'&&this.boss?.active){this.boss.timer=3;this.boss.warning=0;this.event('notice','core');}if(c.kind==='secret'){if(!this.found.includes(c.id)){this.found.push(c.id);this.addScore(c.id,750);this.event('notice','secret');this.event('sound','secret');this.pickups.push({id:'reward-'+c.id,x:c.x,y:c.y,type:c.id==='tree'?'weapon':'grenades',weapon:3});}}else if(c.kind==='barrel'){this.explode(c.x+10,c.y,46,150);}else if(c.drop)this.pickups.push({id:'drop-'+c.id,x:c.x,y:c.y,type:'weapon',weapon:c.drop});}
- freeRescue(r){if(r.free)return;r.free=true;r.run=0;if(!this.rescued.includes(r.id)){this.rescued.push(r.id);this.addScore(r.id,1000);this.player.grenades=Math.min(12,this.player.grenades+1);this.event('notice','rescue');this.event('sound','rescue');}}
+ freeRescue(r){if(r.free)return;r.free=true;r.run=0;if(!this.rescued.includes(r.id)){this.rescued.push(r.id);this.addScore(r.id,1000);this.player.grenades=Math.min(12,this.player.grenades+1);this.event('reward',{x:r.x,y:r.y,text:'+1000  G+1'});this.effect(r.x+8,r.y+6,'shield',8);this.event('notice','rescue');this.event('sound','rescue');}}
  interact(){const p=this.player;if(p.vehicle){p.vehicle=false;p.x=clamp(p.x-15,0,4220);p.y=FLOOR-p.h;p.vy=-110;p.inv=1.8;this.vehicle.x=p.x+32;this.event('sound','enter');return;}
   if(!this.route&&Math.abs(p.x-980)<65){this.event('route');return;}
   const r=this.rescues.find(r=>!r.free&&Math.abs(r.x-p.x)<35&&Math.abs(r.y-p.y)<48);if(r){this.freeRescue(r);return;}
@@ -89,17 +90,17 @@ export class Game{
   if(this.boss?.active){const panel=this.crates.find(c=>c.id==='boss-panel'&&c.hp>0&&Math.abs(c.x-p.x)<35);if(panel){panel.hp=0;this.boss.timer=3;this.boss.warning=0;this.event('notice','core');}}
  }
  enemyShot(e,spread=1){const p=this.player;const dx=p.x+9-(e.x+e.w/2),dy=p.y+18-(e.y+10);const angle=Math.atan2(dy,dx);for(let i=0;i<spread;i++){const a=angle+(i-(spread-1)/2)*.17;this.bullets.push({x:e.x+e.w/2,y:e.y+10,vx:Math.cos(a)*105*this.diff.bullet,vy:Math.sin(a)*105*this.diff.bullet,life:4,damage:1,hostile:true,size:3,color:'#ff6651'});}this.event('sound','enemy');}
- updateEnemies(dt){const p=this.player;for(const e of this.enemies){if(e.hp<=0)continue;e.flash=Math.max(0,e.flash-dt);if(Math.abs(e.x-p.x)>310||e.x+e.w<this.camera||e.x>this.camera+426)continue;
+ updateEnemies(dt){const p=this.player;for(const e of this.enemies){if(e.hp<=0)continue;e.flash=Math.max(0,e.flash-dt);e.firePose=Math.max(0,(e.firePose||0)-dt);if(Math.abs(e.x-p.x)>310||e.x+e.w<this.camera||e.x>this.camera+426)continue;
    if(e.state==='sleep'){e.state='enter';e.timer=.8;e.spawned=true;}
    e.timer-=dt;e.facing=p.x<e.x?-1:1;
    if(e.state==='enter'&&e.timer<=0){e.state='idle';e.timer=.7;}
    else if(e.state==='idle'){
     if(e.type==='soldier'||e.type==='shield'){const d=Math.abs(e.x-p.x);if(d>95&&d<270)e.x+=e.facing*(e.type==='shield'?12:18)*dt;}
-    if(e.timer<=0&&Math.abs(e.x-p.x)<285){e.state='warn';e.warning=(e.type==='radio'?2:.7)*this.diff.warn;e.timer=e.warning;}
+    if(e.timer<=0&&Math.abs(e.x-p.x)<285&&this.enemies.filter(a=>a!==e&&a.hp>0&&a.state==='warn'&&Math.abs(a.x-p.x)<285).length<2){e.state='warn';e.warning=(e.type==='radio'?2:.7)*this.diff.warn;e.timer=e.warning;if(e.type==='sniper'){e.lockX=p.x+9;e.lockY=p.y+18;}}
    }else if(e.state==='warn'&&e.timer<=0){
     if(e.type==='radio'&&!e.reinforced){const d=ENEMIES.soldier;if(this.enemies.filter(e=>e.hp>0&&Math.abs(e.x-p.x)<250).length<7){this.enemies.push({id:e.id+'-reinforce',type:'soldier',x:Math.max(p.x+180,e.x+40),y:FLOOR-d.h,w:d.w,h:d.h,hp:d.hp,max:d.hp,timer:1,state:'enter',warning:0,flash:0,base:e.x,facing:-1});}e.reinforced=true;}
     else if(e.type==='grenadier'){this.grenades.push({x:e.x,y:e.y,vx:clamp((p.x-e.x)*.8,-150,150),vy:-190,timer:1.4,hostile:true,radius:29,damage:1});}
-    else this.enemyShot(e,e.type==='tank'?3:e.type==='turret'?3:1);
+    else this.enemyShot(e,e.type==='tank'?3:e.type==='turret'?3:1);e.firePose=.15;
     e.state='recover';e.timer=ENEMIES[e.type].wait/this.diff.attack;
    }else if(e.state==='recover'&&e.timer<=0){e.state='idle';e.timer=.2;}
   }
@@ -120,25 +121,25 @@ export class Game{
  update(input={},dt=DT){if(this.state!=='play'||this.done||this.gameover)return;const p=this.player;this.time+=dt;this.tick++;
   if(this.winTimer){this.winTimer-=dt;if(this.winTimer<=0){this.done=true;this.score+=15000+this.rescued.length*500+(this.deaths===0?12000:0)+(this.continues===0?8000:0);this.event('win',this.capture());}return;}
   if(p.dead>0){p.dead-=dt;if(p.dead<=0){if(p.lives<=0){this.gameover=true;this.event('gameover');}else this.restore();}return;}
-  for(const key of ['shoot','grenade','switch','melee','inv','dodge','dodgeCD'])p[key]=Math.max(0,p[key]-dt);
+  for(const key of ['shoot','grenade','switch','melee','inv','dodge','dodgeCD','shotFlash','recoil','throwPose','hurtPose','landPose'])p[key]=Math.max(0,(p[key]||0)-dt);
   this.comboTime-=dt;if(this.comboTime<=0)this.combo=0;
   if(input.jumpPressed)p.buffer=.1;else p.buffer=Math.max(0,p.buffer-dt);if(p.ground)p.coyote=.09;else p.coyote=Math.max(0,p.coyote-dt);
   p.crouch=!!(input.down&&p.ground&&!p.vehicle);const dir=Number(!!input.right)-Number(!!input.left);if(dir)p.face=dir;
-  const speed=p.vehicle?125:110;const target=(p.crouch?0:dir)*speed;p.vx+=clamp(target-p.vx,-1400*dt,1400*dt);
+  const speed=p.vehicle?125:110;const target=(p.crouch?0:dir)*speed;const accel=p.vehicle?(dir?700:1050):1400;p.vx+=clamp(target-p.vx,-accel*dt,accel*dt);const aim=aimFor(input,p);p.aimX=aim.x;p.aimY=aim.y;
   if(input.dodgePressed&&p.ground&&!p.vehicle&&p.dodgeCD<=0){p.dodge=.16;p.dodgeCD=1.5;p.inv=Math.max(p.inv,.16);this.effect(p.x,p.y+30,'dust',5);}
   if(p.dodge>0)p.vx=p.face*240;
   if(p.buffer>0&&p.coyote>0&&!p.crouch){p.vy=p.vehicle?-210:-295;p.ground=false;p.coyote=0;p.buffer=0;this.event('sound','jump');this.effect(p.x+10,p.y+34,'dust',5);}
   if(!input.jump&&p.vy<0)p.vy+=700*dt;
-  const oldY=p.y;p.vy+=650*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.ground=false;
+  const oldY=p.y,wasGround=p.ground,fallSpeed=p.vy;p.vy+=650*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.ground=false;
   if(p.y+p.h>=FLOOR){p.y=FLOOR-p.h;p.vy=0;p.ground=true;}
   if(!p.vehicle)for(const plat of this.platforms)if(p.vy>=0&&oldY+p.h<=plat.y+1&&p.y+p.h>=plat.y&&p.x+p.w>plat.x&&p.x<plat.x+plat.w){p.y=plat.y-p.h;p.vy=0;p.ground=true;}
-  let limit=4225;if(!this.route)limit=990;else if(!this.mini.dead)limit=2420;if(this.boss?.active)p.x=Math.max(3850,p.x);p.x=clamp(p.x,4,limit);p.anim+=Math.abs(p.vx)*dt;
+  if(!wasGround&&p.ground&&fallSpeed>160){p.landPose=.1;this.effect(p.x+9,p.y+34,'dust',4);this.event('sound','land');}let limit=4225;if(!this.route)limit=990;else if(!this.mini.dead)limit=2420;if(this.boss?.active)p.x=Math.max(3850,p.x);p.x=clamp(p.x,4,limit);p.anim+=Math.abs(p.vx)*dt;
   if(input.switchPressed&&p.switch<=0){p.slot++;if(p.slot>=p.slots.length)p.slot=-1;p.switch=this.character==='lia'?.158:.18;this.event('sound','switch');}
   if(input.interactPressed)this.interact();if(input.shoot)this.shoot(input);if(input.grenadePressed)this.throwGrenade();
-  if(p.vehicle){this.vehicle.x=p.x-16;this.vehicle.y=p.y+8;}
+  if(p.vehicle){this.vehicle.x=p.x-16;this.vehicle.y=p.y+8;this.vehicle.track=(this.vehicle.track||0)+p.vx*dt;}
   if(this.vehicle.critical>0){this.vehicle.critical-=dt;if(this.vehicle.critical<=0){if(p.vehicle){p.vehicle=false;p.vy=-180;p.inv=2;}this.vehicle.dead=true;this.explode(this.vehicle.x+25,this.vehicle.y,45,120,false);}}
   for(const r of this.rescues)if(r.free)r.run+=dt;
-  for(const item of this.pickups){if(item.taken)continue;if(overlap({x:p.x-4,y:p.y-5,w:p.w+8,h:p.h+10},{x:item.x-8,y:item.y-8,w:16,h:16})){item.taken=true;if(item.type==='weapon')this.pickupWeapon(item.weapon);else{p.grenades=Math.min(12,p.grenades+3);this.event('sound','pickup');this.event('notice','grenade');}}}
+  for(const item of this.pickups){if(item.taken)continue;if(overlap({x:p.x-4,y:p.y-5,w:p.w+8,h:p.h+10},{x:item.x-8,y:item.y-8,w:16,h:16})){item.taken=true;this.event('reward',{x:item.x,y:item.y,text:item.type==='weapon'?WEAPONS[item.weapon].name:'G+3'});this.effect(item.x,item.y,'shield',5);if(item.type==='weapon')this.pickupWeapon(item.weapon);else{p.grenades=Math.min(12,p.grenades+3);this.event('sound','pickup');this.event('notice','grenade');}}}
   this.updateEnemies(dt);this.updateMini(dt);
   if(this.mini.dead&&this.lastCheckpoint<2&&p.x>2700){this.event('music','mission');this.checkpoint(2);}
   if(!this.boss&&p.x>3850){this.boss=this.createBoss();this.crates.push({id:'boss-panel',x:3960,y:191,w:18,h:19,hp:50,kind:'panel'});this.event('notice','boss');this.event('radio','radio5');this.event('music','boss');}
@@ -154,7 +155,7 @@ export class Game{
   }this.bullets=this.bullets.filter(b=>b.life>0);
   for(const g of this.grenades){g.timer-=dt;g.x+=g.vx*dt;g.vy+=480*dt;g.y+=g.vy*dt;if(g.y>=FLOOR-3){g.y=FLOOR-3;g.vy=-Math.abs(g.vy)*.32;g.vx*=.6;}if(g.timer<=0)this.explode(g.x,g.y,g.radius,g.damage,g.hostile);}this.grenades=this.grenades.filter(g=>g.timer>0);
   for(const h of this.hazards){h.life-=dt;if(h.warning>0){h.warning-=dt;continue;}if(h.type==='container'){h.vy+=480*dt;h.y+=h.vy*dt;if(overlap(h,{x:p.x,y:p.y,w:p.w,h:p.h}))this.damage();if(h.y+h.h>=FLOOR){this.explode(h.x+h.w/2,FLOOR,25,1,true);h.life=0;}}else if(overlap(h,{x:p.x,y:p.y,w:p.w,h:p.h}))this.damage();}this.hazards=this.hazards.filter(h=>h.life>0);
-  const desired=clamp(p.x-155,0,3840);this.camera+=(desired-this.camera)*Math.min(1,dt*6);if(this.boss?.active)this.camera+=(3840-this.camera)*dt*5;
+  const desired=clamp(p.x-155+clamp(p.vx/110,-1,1)*22,0,3840);this.camera+=(desired-this.camera)*Math.min(1,dt*6);if(this.boss?.active)this.camera+=(3840-this.camera)*dt*5;
   if(!this.flags.fork&&p.x>850){this.flags.fork=true;this.event('radio','radio2');}
  }
 }

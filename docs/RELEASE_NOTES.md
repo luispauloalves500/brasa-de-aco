@@ -1,3 +1,17 @@
+# v0.3.0 — Polimento das duas missões
+
+- Nova direção de pixel art: heróis, inimigos, animações, máquinas, chefes e arquitetura própria por setor.
+- Cenários multicamadas, efeitos atmosféricos e explosões em camadas; nova fonte local, retratos e HUD.
+- Hitstop com proteção de acessibilidade, recoil, feedback de resgate/pickup e animação das esteiras por movimento físico.
+- Mira contínua, look-ahead, avisos de ataque limitados, bloqueio frontal correto e alvo anunciado dos snipers.
+- Cues distintas para armas, mix musical/percussão mais leve, prioridade dos alertas e SFX silenciados na pausa.
+- Backup automático recuperável, remapeamento seguro, controle em slot não zero e toque respeitando remapeamento.
+- Movimento reduzido do sistema, redução de flashes e anúncios acessíveis. Caches e efeitos com orçamentos explícitos.
+- 65 testes Node; dez cenários de campanha + um harness de polimento. Benchmark separado com relógio real, sem fingir FPS via tempo virtual.
+- Não acrescenta missões, coop ou finais. Escopo e evidências em POLIMENTO.md, QA.md e PUBLICACAO.md.
+
+---
+
 # v0.2.0 — Trilho Partido
 
 - Segunda missão autoral com seis trechos, duas rotas, sete resgates e três segredos.

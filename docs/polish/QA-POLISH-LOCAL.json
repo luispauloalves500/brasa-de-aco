@@ -1,0 +1,19 @@
+{
+  "ok": true,
+  "checks": [
+    "10 states / hero; 8 run frames; 8 aim directions; distinct pixels",
+    "sprite cache bounded",
+    "portraits / FX option / remap conflict / valid remap",
+    "sparse gamepad slots",
+    "hitstop decay / reduced-motion bypass",
+    "FX budgets / expiration",
+    "60 warmed render submissions; virtual clock is not a wall-clock measurement"
+  ],
+  "errors": [],
+  "renderSubmissionMS": null,
+  "timingNote": "Virtual-time run; real-clock submission benchmark is in perf-results.json",
+  "cache": {
+    "sprites": 4,
+    "surfaces": 5
+  }
+}

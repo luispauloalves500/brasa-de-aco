@@ -28,7 +28,7 @@ export class CampaignArt extends Art{
  enemy(e,cam){if(this.scene?.missionId!==2||!['para','sniper','elite'].includes(e.type)){super.enemy(e,cam);return;}if(e.hp<=0||e.state==='sleep'||e.x<cam-40||e.x>cam+470)return;const x=e.x-cam,y=e.y;
   if(e.type==='para'&&e.descending){this.poly([[x-16,y-27],[x-10,y-37],[x+22,y-37],[x+31,y-27]],'#c0b589');this.rect(x-17,y-27,49,3,'#698780');for(const a of [-12,8,28])this.line(x+a,y-25,x+9,y+2,'#d1cfaa');}
   this.human(x,y,{color:e.type==='elite'?'#7e8580':e.type==='sniper'?'#9b946f':'#8a9b79',face:e.facing||-1,enemy:true,type:e.type==='elite'?'shield':'',aimX:1,aimY:0,flash:e.flash>0,anim:e.state==='recover'?this.clock*10:0});
-  if(e.type==='sniper'){this.rect(x+e.facing*7,y+11,32,2,'#adbcaa');if(e.state==='warn'){const p=this.scene.player;this.line(x+9,y+12,p.x+9-cam,p.y+18,'#faac6f');this.text('⊕',x+9,y-14,'#ffda94',8,'center');}}
+  if(e.type==='sniper'){if(e.state==='warn'){const p=this.scene.player;this.line(x+9,y+12,(e.lockX??p.x+9)-cam,e.lockY??p.y+18,'#faac6f');this.text('⊕',x+9,y-14,'#ffda94',8,'center');}}
   if(e.state==='warn')this.text('!',x+9,y-10,'#ffdf98',9,'center');
  }
  tank(x,y,kind='friendly',hp=1,occupied=false,time=this.clock,aim=null){if(this.scene?.missionId!==2||kind!=='friendly'){super.tank(x,y,kind,hp,occupied,time,aim);return;}
