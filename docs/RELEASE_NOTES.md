@@ -6,7 +6,8 @@
 - Briefing/epílogo ilustrados, PT-BR/EN e três cues musicais originais.
 - Seleção/desbloqueio de missões, encadeamento M1→M2, save compatível e regulador de engenharia persistente.
 - Correções: inimigos fora da câmera não atiram; replay não herda timer de vitória.
-- 47 testes e dez cenários Chromium em localhost. QA de publicação registrado separadamente.
+- 47 testes e dez cenários Chromium em localhost e na URL pública. QA de publicação registrado separadamente.
+- Bundle estático versionado e commitado, sem CDN, evitando mistura de módulos no cache. CI verifica que o bundle corresponde às fontes.
 - Missões 3–8, coop, finais completos e certificação de hardware seguem fora.
 
 ---

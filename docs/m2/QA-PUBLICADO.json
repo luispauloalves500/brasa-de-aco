@@ -1,0 +1,108 @@
+[
+  {
+    "ok": true,
+    "scene": "village",
+    "checks": [
+      "M2 initially locked",
+      "M1 full bot victory \u2192 unlock \u2192 M2 briefing/play",
+      "mission select unlock",
+      "M2 PT/EN/options",
+      "no runtime/HTTP errors"
+    ],
+    "errors": [],
+    "mission": 2,
+    "x": 680.3888888888902,
+    "route": null,
+    "engineering": {
+      "railRescued": false,
+      "railComponent": false,
+      "rail": false
+    },
+    "time": 5.716666666666652
+  },
+  {
+    "ok": true,
+    "scene": "roofs",
+    "checks": [
+      "M2 initially locked",
+      "M1 full bot victory \u2192 unlock \u2192 M2 briefing/play",
+      "mission select unlock",
+      "M2 PT/EN/options",
+      "no runtime/HTTP errors"
+    ],
+    "errors": [],
+    "mission": 2,
+    "x": 1511.3660963168861,
+    "route": "B",
+    "engineering": {
+      "railRescued": false,
+      "railComponent": false,
+      "rail": false
+    },
+    "time": 13.30000000000024
+  },
+  {
+    "ok": true,
+    "scene": "truck",
+    "checks": [
+      "M2 initially locked",
+      "M1 full bot victory \u2192 unlock \u2192 M2 briefing/play",
+      "mission select unlock",
+      "M2 PT/EN/options",
+      "no runtime/HTTP errors"
+    ],
+    "errors": [],
+    "mission": 2,
+    "x": 2340.5555555555434,
+    "route": "A",
+    "engineering": {
+      "railRescued": true,
+      "railComponent": true,
+      "rail": true
+    },
+    "time": 20.550000000000114
+  },
+  {
+    "ok": true,
+    "scene": "boss",
+    "checks": [
+      "M2 initially locked",
+      "M1 full bot victory \u2192 unlock \u2192 M2 briefing/play",
+      "mission select unlock",
+      "M2 PT/EN/options",
+      "no runtime/HTTP errors"
+    ],
+    "errors": [],
+    "mission": 2,
+    "x": 3974.4444444445685,
+    "route": "A",
+    "engineering": {
+      "railRescued": true,
+      "railComponent": true,
+      "rail": true
+    },
+    "time": 52.483333333331636
+  },
+  {
+    "ok": true,
+    "scene": "finish",
+    "checks": [
+      "M2 initially locked",
+      "M1 full bot victory \u2192 unlock \u2192 M2 briefing/play",
+      "mission select unlock",
+      "M2 PT/EN/options",
+      "M2 victory/epilogue/engineering/continue",
+      "no runtime/HTTP errors"
+    ],
+    "errors": [],
+    "mission": 2,
+    "x": 2701.2500000000205,
+    "route": "A",
+    "engineering": {
+      "railRescued": true,
+      "railComponent": true,
+      "rail": true
+    },
+    "time": 38.71666666666575
+  }
+]
