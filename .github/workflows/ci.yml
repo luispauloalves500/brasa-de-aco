@@ -8,6 +8,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
+      - run: npm ci
+      - run: npm run build
+      - name: Verify committed bundle
+        run: git diff --exit-code -- index.html game-v*.js
       - run: npm test
       - name: Validate modules
         run: for f in src/*.js; do node --check "$f"; done

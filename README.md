@@ -67,7 +67,9 @@ python3 -m http.server 8089
 npm test  # Node 20+; 47 testes
 ```
 
-Nenhum build ou dependência em runtime. Não abrir via `file://`, pois módulos ES precisam de servidor estático. Pages publica `main`, raiz, com `.nojekyll`.
+Nenhum build ou dependência em runtime: o bundle versionado já está no repositório. Pages publica `main`, raiz, com `.nojekyll`. Use servidor estático também em desenvolvimento.
+
+Para alterar fontes: `npm ci && npm run build`. O esbuild é apenas ferramenta de desenvolvimento; nada é buscado em CDN. O bundle único evita misturar módulos antigos e novos no cache do navegador. Nas próximas versões, incremente a versão do `package.json` antes de gerar o bundle. Se a aba já estava aberta antes da atualização, recarregue com **Ctrl+F5**.
 
 ```sh
 BASE=http://127.0.0.1:8089 CHROME=/caminho/chrome-headless-shell bash tools/browser-qa.sh
